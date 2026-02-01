@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>STORM ROYALE</title>
+    
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loading-screen">
+        <div class="loading-logo">STORM ROYALE</div>
+        <div class="loading-bar-container">
+            <div class="loading-bar" id="loading-bar"></div>
+        </div>
+        <div class="loading-text" id="loading-text">初期化中...</div>
+        <div class="loading-tips">💡 ヒント: ストームから逃げながら最後の1人を目指そう！</div>
+    </div>
+
+    <div id="lobby-screen">
+        <div class="lobby-header">
+            <div class="lobby-title">STORM ROYALE</div>
+            <div class="lobby-subtitle">バトルロイヤルに参加する準備はできましたか？</div>
+        </div>
+        <div class="lobby-content">
+            <div class="mode-section">
+                <div class="section-title">ゲームモード</div>
+                <div class="mode-grid">
+                    <div class="mode-card selected" data-mode="solo">
+                        <div class="mode-name">🎯 ソロ</div>
+                        <div class="mode-desc">100人のプレイヤーで最後の1人を目指す</div>
+                        <div class="mode-info">難易度: ★★★☆☆</div>
+                    </div>
+                    <div class="mode-card" data-mode="fast">
+                        <div class="mode-name">⚡ 高速モード</div>
+                        <div class="mode-desc">ストームの速度が2倍速で進行</div>
+                        <div class="mode-info">難易度: ★★★★☆</div>
+                    </div>
+                    <div class="mode-card" data-mode="hardcore">
+                        <div class="mode-name">💀 ハードコア</div>
+                        <div class="mode-desc">ダメージ増加・回復アイテム減少</div>
+                        <div class="mode-info">難易度: ★★★★★</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mode-section">
+                <div class="section-title">操作方法</div>
+                <div style="font-size: 0.85rem; color: rgba(255,255,255,0.7); line-height: 1.6;">
+                    <div style="margin-bottom: 8px;">📱 <strong>移動:</strong> 左ジョイスティック</div>
+                    <div style="margin-bottom: 8px;">👁️ <strong>視点:</strong> 画面中央をスワイプ</div>
+                    <div style="margin-bottom: 8px;">🎯 <strong>射撃:</strong> 赤いボタン</div>
+                    <div style="margin-bottom: 8px;">🔨 <strong>建築:</strong> 黄色いボタン</div>
+                    <div style="margin-bottom: 8px;">⬆️ <strong>ジャンプ:</strong> 紫のボタン</div>
+                </div>
+            </div>
+            <button class="start-button" onclick="game.startGame()">ゲーム開始</button>
+        </div>
+    </div>
+
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+    </div>
+
+    <div id="hud">
+        <div class="hud-top">
+            <div class="alive-counter">🎮 生存者: <span id="alive-count">100</span></div>
+            <div class="storm-timer" id="storm-timer">2:00</div>
+        </div>
+        <div class="hud-top-left">
+            <canvas class="minimap" id="minimap" width="110" height="110"></canvas>
+        </div>
+        <div class="hud-top-right">
+            <div class="kill-count">💀 キル: <span id="kill-count">0</span></div>
+        </div>
+        <div class="hud-bottom">
+            <div class="health-shield-bar">
+                <div class="bar-container">
+                    <div class="bar-fill health-bar" id="health-bar" style="width: 100%;"></div>
+                    <div class="bar-text">❤️ <span id="health-text">100</span></div>
+                </div>
+                <div class="bar-container">
+                    <div class="bar-fill shield-bar" id="shield-bar" style="width: 100%;"></div>
+                    <div class="bar-text">🛡️ <span id="shield-text">100</span></div>
+                </div>
+            </div>
+            <div class="inventory-bar" id="inventory-bar"></div>
+            <div class="ammo-display" id="ammo-display"></div>
+        </div>
+    </div>
+
+    <div id="controls">
+        <div class="joystick-area" id="joystick-area">
+            <div class="joystick-base">
+                <div class="joystick-stick" id="joystick-stick"></div>
+            </div>
+        </div>
+        <div class="camera-area" id="camera-area"></div>
+        <div class="action-buttons">
+            <button class="action-btn aim-btn" id="aim-btn">🎯</button>
+            <button class="action-btn build-btn" id="build-btn">🔨</button>
+            <button class="action-btn fire-btn" id="fire-btn">🔥</button>
+            <button class="action-btn reload-btn" id="reload-btn">🔄</button>
+            <button class="action-btn jump-btn" id="jump-btn">⬆️</button>
+        </div>
+    </div>
+
+    <div id="build-menu"></div>
+
+    <div id="pickup-notification">
+        <div class="pickup-name" id="pickup-name"></div>
+        <div class="pickup-desc" id="pickup-desc"></div>
+        <button id="pickup-btn">拾う</button>
+    </div>
+
+    <div id="crosshair">
+        <div class="crosshair-line crosshair-h"></div>
+        <div class="crosshair-line crosshair-v"></div>
+        <div class="crosshair-dot"></div>
+    </div>
+
+    <div id="kill-feed"></div>
+
+    <div id="gameover-screen">
+        <div class="gameover-title" id="gameover-title">VICTORY ROYALE</div>
+        <div class="gameover-stats">
+            <div class="stat-row">
+                <span class="stat-label">最終順位</span>
+                <span class="stat-value" id="final-rank">#1</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">キル数</span>
+                <span class="stat-value" id="final-kills">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">与ダメージ</span>
+                <span class="stat-value" id="final-damage">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">生存時間</span>
+                <span class="stat-value" id="final-time">0:00</span>
+            </div>
+        </div>
+        <div class="gameover-buttons">
+            <button class="gameover-btn btn-primary" onclick="game.returnToLobby()">ロビーに戻る</button>
+            <button class="gameover-btn btn-secondary" onclick="game.reset();game.startGame();">リプレイ</button>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+  <script src="main.js"></script>
+</body>
+</html>
